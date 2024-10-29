@@ -143,7 +143,6 @@ def find_valid_numbers(square : Square) -> list[bool]:
             
     return valid_numbers
     # TODO You have to write this
-    return None
 
 def solve(grid : list[list[Square]]) -> bool:
     """Returns true if `grid` can be solved. If so, `grid` is modified to fill
@@ -176,7 +175,6 @@ def solve(grid : list[list[Square]]) -> bool:
     #                 return True
     #         nothing worked: set value back to 0 and return False
     # no squares left to fill in: return true
-    return True
 
 if __name__ == '__main__':
     main()
