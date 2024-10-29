@@ -92,15 +92,19 @@ def create_squares(diagram : str = None) -> list[list[Square]]:
         for c in range(9):
             s = grid[r][c]
             s.value = 0
-            s.row = [None]*8
-            s.column = [None]*8
-            s.block = [None]*8
+            s.row = [None] * 8
+            s.column = [None] * 8
+            s.block = [None] * 8
 
     # Populate the grid with values from the diagram
     if diagram:
+        lines = diagram.strip().split('\n')  # Split by lines
         for r in range(9):
             for c in range(9):
-                value = int(diagram[r * 9 + c]) if diagram[r * 9 + c].isdigit() else 0
+                if lines[r][c].isdigit():
+                    value = int(lines[r][c])
+                else:
+                    value = 0
                 grid[r][c].value = value
 
     # Set neighbors for each square
@@ -110,8 +114,8 @@ def create_squares(diagram : str = None) -> list[list[Square]]:
             s.row = [grid[r][i] for i in range(9) if i != c]
             s.column = [grid[i][c] for i in range(9) if i != r]
             s.block = [grid[i][j] for i in range((r // 3) * 3, (r // 3) * 3 + 3)
-                                               for j in range((c // 3) * 3, (c // 3) * 3 + 3)
-                                               if (i, j) != (r, c)]
+                                           for j in range((c // 3) * 3, (c // 3) * 3 + 3)
+                                           if (i, j) != (r, c)]
 
     return grid
 
@@ -122,7 +126,7 @@ def __str__(grid : list[list[Square]]) -> str:
     return '\n'.join(
         ''.join(str(square.value) if square.value != 0 else '.' for square in row)
         for row in grid
-    )
+    ) + '\n'  # Add a newline at the end for consistency
     # TODO You have to write this
     return None
 
@@ -130,13 +134,38 @@ def find_valid_numbers(square : Square) -> list[bool]:
     """Returns a boolean array of length 10.  For each digit, the
     corresponding entry in the array is `True` if that number does not
     appear elsewhere in the `Square`'s row, column, or block."""
-
+    valid_numbers = [True] * 10  # Index 0-9, where 0 is ignored
+    
+    # Check row, column, and block for existing numbers
+    for neighbor in square.row + square.column + square.block:
+        if neighbor.value != 0:  # Ignore empty squares
+            valid_numbers[neighbor.value] = False
+            
+    return valid_numbers
     # TODO You have to write this
     return None
 
 def solve(grid : list[list[Square]]) -> bool:
     """Returns true if `grid` can be solved. If so, `grid` is modified to fill
     in that solution."""
+    
+    for r in range(9):
+        for c in range(9):
+            if grid[r][c].value == 0:  # Found an empty square
+                # Try numbers 1 to 9
+                for num in range(1, 10):
+                    grid[r][c].value = num  # Place the number
+                    valid_numbers = find_valid_numbers(grid[r][c])
+                    
+                    if valid_numbers[num]:  # If the number is valid
+                        if solve(grid):  # Recursively try to solve the rest of the grid
+                            return True  # Found a solution
+                        
+                    grid[r][c].value = 0  # Backtrack if not valid
+                
+                return False  # No valid number could be placed in this square
+    
+    return True  # No empty squares left; the puzzle is solved
 
     # TODO You have to write this
     # Here's an outline of the algorithm:
