@@ -98,7 +98,7 @@ def create_squares(diagram : str = None) -> list[list[Square]]:
 
     # Populate the grid with values from the diagram
     if diagram:
-        lines = diagram.strip().split('\n')  # Split by lines
+        lines = diagram.split('\n')  # Split by lines
         for r in range(9):
             for c in range(9):
                 if lines[r][c].isdigit():
